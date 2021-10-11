@@ -1,5 +1,6 @@
 package ds5
 
+// Axis values -1 to 1
 type Axis struct {
 	Left  Joystick
 	Right Joystick

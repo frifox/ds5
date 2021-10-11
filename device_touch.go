@@ -2,6 +2,7 @@ package ds5
 
 import "math"
 
+// Touchpad points are across 1920 x 1080 plane
 type Touchpad struct {
 	Touch1 Touch
 	Touch2 Touch

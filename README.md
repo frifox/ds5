@@ -213,6 +213,26 @@ Or, light up leds according to a predefined PlayerID/VolumeBar map ([see src](ht
     dev.PlayerLEDs.SetBar(3)
     dev.ApplyProps(dev.PlayerLEDs)
 
+## Rumble
+
+Control left / right rumble motors separately. Left motor is slow/deep and right motor is fast/light.
+
+    // dev.Rumble
+    type Rumble struct {
+        Left  uint8
+        Right uint8
+    }
+
+Rumble left motor for 1 sec, ex:
+
+    dev.Rumble.Left = 255
+    dev.ApplyProps(dev.Rumble)
+
+    time.Sleep(time.Second)
+
+    dev.Rumble.Left = 0
+    dev.ApplyProps(dev.Rumble)
+
 ## Mic
 
 Control the Mute button LED and the onboard Mic state individually.

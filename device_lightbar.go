@@ -1,5 +1,6 @@
 package ds5
 
+// LightBar values 0 to 255
 type LightBar struct {
 	Red   uint8
 	Green uint8
