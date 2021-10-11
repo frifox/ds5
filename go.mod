@@ -1,4 +1,4 @@
-module ds5
+module github.com/frifox/ds5
 
 go 1.17
 
