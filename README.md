@@ -146,7 +146,7 @@ You can monitor changes (see [src](https://github.com/frifox/ds5/blob/master/han
     // dev.Bus
     type Bus string
 
-Data packets over BT use CRC32 and packets over SUB do not. Bus is set to `bt` for bluetooth and `usb` for usb every time you call `dev.Watch()`, where CRC32 is checked for the first time.
+Data packets over BT use CRC32 and packets over USB do not. Bus is set to `bt` for bluetooth and `usb` for usb every time you call `dev.Watch()`, where CRC32 is checked for the first time.
 
     // TODO add OnChange callback for Bus
 
