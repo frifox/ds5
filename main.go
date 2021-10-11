@@ -32,7 +32,7 @@ func EnumPrinter(i *hid.DeviceInfo) error {
 	return nil
 }
 
-func ConvertRange(inputMin float64, inputMax float64, outputMin float64, outputMax float64, inputValue interface{}, clip ...bool) (outputValue float64) {
+func ConvertRange(inputMin, inputMax, outputMin, outputMax float64, inputValue interface{}, clip ...bool) (outputValue float64) {
 	inputValueAsFloat := 0.0
 	switch i := inputValue.(type) {
 	case uint8:
@@ -72,7 +72,7 @@ func ConvertRange(inputMin float64, inputMax float64, outputMin float64, outputM
 
 	return
 }
-func RemoveDeadZone(deadZone float64, value float64) float64 {
+func RemoveDeadZone(deadZone, value float64) float64 {
 	deadZone = math.Abs(deadZone)
 	if math.Abs(value) <= deadZone {
 		return 0

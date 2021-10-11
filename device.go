@@ -9,7 +9,7 @@ const USB_VENDOR_ID_SONY = 0x54c
 const USB_DEVICE_ID_SONY_PS5_CONTROLLER = 0xce6
 
 type Device struct {
-	Bus
+	Bus      Bus
 	Touchpad Touchpad
 
 	Buttons Buttons
@@ -21,9 +21,9 @@ type Device struct {
 	Mic        Mic
 	Rumble     Rumble
 
-	AliveFor
-	OutputSequencer
-	hid *hid.Device
+	AliveFor        AliveFor
+	OutputSequencer OutputSequencer
+	hid             *hid.Device
 }
 
 func (d *Device) Find() (err error) {
