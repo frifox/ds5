@@ -215,7 +215,7 @@ Or, light up leds according to a predefined PlayerID/VolumeBar map ([see src](ht
 
 ## Rumble
 
-Control left / right rumble motors separately. Left motor is slow/deep and right motor is fast/light.
+Control left / right rumble motors. Left motor is slow/deep and right motor is fast/light.
 
     // dev.Rumble
     type Rumble struct {
