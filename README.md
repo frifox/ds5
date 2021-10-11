@@ -223,7 +223,7 @@ Control the Mute button LED and the onboard Mic state individually.
         Muted bool
     }
 
-Turn on LED but keep Mic on ex:
+Turn on LED but keep Mic on, ex:
 
     dev.Mic.LED = true
     dev.Mic.Muted = false
