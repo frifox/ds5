@@ -12,7 +12,7 @@ func main() {
 	ds5.PrintAllHIDs()
 
 	dev := &ds5.Device{}
-	dev.LightBar.Set(255, 255, 255)
+	dev.LightBar.Set(255, 255, 0)
 
 	// there are ~128 steps from center to 100% left/right/up/down
 	dev.Axis.Left.DeadZone = 10.0 / 128  // ignore -10 to +10 from center
