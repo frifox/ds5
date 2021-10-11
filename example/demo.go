@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/frifox/ps5"
+	"github.com/frifox/ds5"
 	"math"
 	"sync"
 	"time"
