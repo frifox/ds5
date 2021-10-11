@@ -22,6 +22,8 @@ func main() {
 	dev.Axis.Left.InvertY = true
 	dev.Axis.Right.InvertY = true
 
+	dev.PlayerLEDs[1] = false
+
 	// bind to some events before we start ds5 watcher
 	setButtonCallbacks(dev)
 	setAxisCallbacks(dev)
@@ -62,9 +64,9 @@ func setMiscCallbacks(dev *ds5.Device) {
 		fmt.Printf("[Battery] %s (%d%%)\n", dev.Battery.Status, dev.Battery.Percent)
 	}
 
-	//dev.AliveFor.OnChange = func(t time.Duration) {
-	//	fmt.Printf("[AliveFor] %s\n", t.String())
-	//}
+	dev.AliveFor.OnChange = func(t time.Duration) {
+		fmt.Printf("[AliveFor] %s\n", t.String())
+	}
 }
 
 func setButtonCallbacks(dev *ds5.Device) {

@@ -12,16 +12,17 @@ func main() {
 		return
 	}
 
-	setCallbacks(&dev)
+	dev.Buttons.Cross.OnKeyDown = func() {
+		fmt.Printf("X pressed\n")
+	}
+	dev.Buttons.Cross.OnKeyUp = func() {
+		fmt.Printf("X released\n")
+	}
+	dev.Axis.Left.OnChange = func(x, y float64) {
+		fmt.Printf("Left Joystic X:%.3f Y:%.3f\n", x, y)
+	}
 
 	fmt.Printf("Watching DS5 for events")
 	dev.Watch()
 	fmt.Printf("DS5 disappeared\n")
-}
-
-func setCallbacks(dev *ds5.Device) {
-	dev.Buttons.Cross.OnKeyDown = func() {
-		fmt.Printf("X pressed!\n")
-	}
-
 }
