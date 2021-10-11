@@ -54,8 +54,7 @@ func (d *Device) Watch() {
 	}
 
 	// pre-apply props
-	d.ApplyProps(LightBarInit{})
-	d.ApplyProps(d.LightBar, d.PlayerLEDs, d.Rumble)
+	d.ApplyProps(LightBarInit{}, d.LightBar, d.PlayerLEDs, d.Rumble)
 
 	//d.GetFeatureReport(DS_FEATURE_REPORT_PAIRING_INFO, DS_FEATURE_REPORT_PAIRING_INFO_SIZE)
 	//d.GetFeatureReport(DS_FEATURE_REPORT_FIRMWARE_INFO, DS_FEATURE_REPORT_FIRMWARE_INFO_SIZE)
@@ -70,6 +69,9 @@ func (d *Device) ApplyProps(props ...interface{}) {
 	var applied []interface{}
 	for _, prop := range props {
 		switch p := prop.(type) {
+		case LightBarInit:
+			applied = append(applied, p)
+
 		case LightBar:
 			d.LightBar = p
 			applied = append(applied, p)
