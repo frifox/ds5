@@ -16,8 +16,8 @@ func main() {
 	//dev.PlayerLEDs.SetBar(1)
 
 	// there are ~128 steps from center to 100% left/right/up/down
-	dev.Axis.Left.DeadZone = 10.0 / 128  // ignore -7 to +7 from center
-	dev.Axis.Right.DeadZone = 10.0 / 128 // ignore -7 to +7 from center
+	dev.Axis.Left.DeadZone = 10.0 / 128  // ignore -10 to +10 from center
+	dev.Axis.Right.DeadZone = 10.0 / 128 // ignore -10 to +10 from center
 
 	// I like when up is +1 and down is -1
 	dev.Axis.Left.InvertY = true

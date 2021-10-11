@@ -73,15 +73,30 @@ func (d *Device) ApplyProps(props ...interface{}) {
 		case LightBar:
 			d.LightBar = p
 			applied = append(applied, p)
+		case *LightBar:
+			d.LightBar = *p
+			applied = append(applied, *p)
+
 		case PlayerLEDs:
 			d.PlayerLEDs = p
 			applied = append(applied, p)
+		case *PlayerLEDs:
+			d.PlayerLEDs = *p
+			applied = append(applied, *p)
+
 		case Rumble:
 			d.Rumble = p
 			applied = append(applied, p)
+		case *Rumble:
+			d.Rumble = *p
+			applied = append(applied, *p)
+
 		case Mic:
 			d.Mic = p
 			applied = append(applied, p)
+		case *Mic:
+			d.Mic = *p
+			applied = append(applied, *p)
 		}
 	}
 
