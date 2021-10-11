@@ -43,8 +43,6 @@ Use `Bus`, `Battery`, `AliveFor` for status info.
 
 Use `LightBar`, `PlayerLED`, and `Mute` for controlling the controller hardware.
 
-# Input Events
-
 ## Buttons
     // ds5.Device.Buttons
     type Buttons struct {
@@ -127,8 +125,6 @@ Touches have `OnActive` / `OnInactive` callbacks. Ex:
 		fmt.Printf("Touch1 Inactive [ID:%d]\n", id)
 	}
 
-# Status Info
-
 ## Battery
 
 Monitor controller battery status and whether it's currently charging or not.
@@ -169,7 +165,6 @@ Bind to OnChange event ex:
     	fmt.Printf("AliveFor %s\n", t.String())
     }
 
-# Manage DS5 Hardware
 ## RGB LightBar
 Full RGB lightbar around the touchpad.
 
