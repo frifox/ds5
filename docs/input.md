@@ -142,11 +142,11 @@ Track 1 or 2 finger touches across a 1920x1080 touchpad
 Touches have `OnActive` / `OnInactive` callbacks. Ex:
 
     t1 := &dev.Touchpad.Touch1
-	t1.OnActive = func(id uint8, x int, y int) {
-		fmt.Printf("Touch1 Active [ID:%d X:%d Y:%d]\n", id, x, y)
+	t1.OnActive = func(t *ds5.Touch) {
+		fmt.Printf("Touch1 Active [ID:%d X:%d Y:%d]\n", t.ID, t.X, t.Y)
 	}
-	t1.OnInactive = func(id uint8) {
-		fmt.Printf("Touch1 Inactive [ID:%d]\n", id)
+	t1.OnInactive = func(t *ds5.Touch) {
+		fmt.Printf("Touch1 Inactive [ID:%d]\n", t.ID)
 	}
 
 ## Battery
