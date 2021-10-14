@@ -99,11 +99,16 @@ You can monitor changes (see [src](https://github.com/frifox/ds5/blob/master/han
 ## Bus
 
     // dev.Bus
-    type Bus string
+    type Bus struct {
+        Type string
+    }
 
 Data packets over BT are CRC32 signed and packets over USB are not. Bus value is set to `bt` / `usb` every time `dev.Watch()` is called, where packet crc is checked for the first time.
 
-    // TODO add OnChange callback for Bus
+    dev.Bus.OnChange = func() {
+		fmt.Printf("DS5 is now connected via %s\n", dev.Bus.Type)
+	}
+    
 
 ## AliveFor
 
