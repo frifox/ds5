@@ -48,13 +48,5 @@ For working examples, check [examples](https://github.com/frifox/ds5/tree/master
     }
 
 
-# ds5.Device{}
-This is the main device struct.
-
-Use `Buttons`, `Axis`, `Motion` properties for input events.
-
-Use `Bus`, `Battery`, `AliveFor` for status info.
-
-Use `LightBar`, `PlayerLED`, and `Mute` for controlling the controller hardware.
-
-See [docs/input.md](https://github.com/frifox/ds5/tree/master/docs/input.md) & [docs/output.md](https://github.com/frifox/ds5/tree/master/docs/output.md) for details.
+# More info?
+See [docs/input.md](https://github.com/frifox/ds5/tree/master/docs/input.md) & [docs/output.md](https://github.com/frifox/ds5/tree/master/docs/output.md)

@@ -93,12 +93,44 @@ Axis have `OnChange` callbacks. Ex:
     dev.Axis.L1.OnChange = func(z float64) {
         fmt.Printf("L1 throttle: %.3f\n", z)
     }
+
+## Gyro
+
+How fast you change Pitch, Roll, and Yaw.
+
+    type Gyro struct {
+        Pitch    float64
+        Roll     float64
+        Yaw      float64
+    }
+
+Values are -1 to +1:
+
+* Pitch: -1 down, +1 up
+* Yaw: -1 left, +1 right
+* Roll: -1 left, +1 right
+
     
+    dev.Gyro.OnChange = func(pitch, yaw, roll float64) {
+        fmt.Printf("Gyroscope: Pitch: %.3f | Yaw: %.3f | Roll: %.3f\n", pitch, yaw, roll)     
+    }
+
+## Accel
+
+How much gravity is pulling on an axis. Axis in-line with gravity = -1 / +1, axis perpendicular with gravity = 0;
+
+* X: left to right (ie: Roll)
+* Y: bottom to top (ie: Orientation)
+* Z: front to back (ie: Pitch)
+
+    
+    dev.Accel.OnChange = func(x, y, z float64) {
+        fmt.Printf("Accelerometer: X: %.3f | Y: %.3f | Z: %.3f\n", x, y, z)     
+    }
 
 ## Touchpad
 Track 1 or 2 finger touches across a 1920x1080 touchpad
 
-    // ds5.Device.Touchpad
     type Touchpad struct {
         Touch1 Touch
         Touch2 Touch
@@ -118,7 +150,6 @@ Touches have `OnActive` / `OnInactive` callbacks. Ex:
 
 Monitor controller battery status and whether it's currently charging or not.
 
-    // dev.Battery
     type Battery struct {
         Percent  uint8
         Status   string
@@ -132,7 +163,6 @@ You can monitor changes (see [src](https://github.com/frifox/ds5/blob/master/han
 
 ## Bus
 
-    // dev.Bus
     type Bus struct {
         Type string
     }
@@ -148,7 +178,6 @@ Data packets over BT are CRC32 signed and packets over USB are not. Bus value is
 
 As reported by the controller. For less verbosity I round this event value to the nearest second.
 
-    // dev.AliveFor
     type AliveFor struct {
         Duration time.Duration
     }
