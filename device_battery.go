@@ -16,6 +16,6 @@ func (b *Battery) Set(status string, percent uint8) {
 
 	// any callbacks?
 	if b.OnChange != nil {
-		b.OnChange()
+		go b.OnChange()
 	}
 }

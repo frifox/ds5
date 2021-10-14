@@ -14,15 +14,18 @@ func main() {
 
 	dev.Buttons.Cross.OnKeyDown = func() {
 		fmt.Printf("X pressed\n")
+
+		dev.LightBar.SetRed()
+		dev.ApplyProps()
 	}
 	dev.Buttons.Cross.OnKeyUp = func() {
 		fmt.Printf("X released\n")
-	}
-	dev.Axis.Left.OnChange = func(x, y float64) {
-		fmt.Printf("Left Joystic X:%.3f Y:%.3f\n", x, y)
+
+		dev.LightBar.SetGreen()
+		dev.ApplyProps()
 	}
 
-	fmt.Printf("Watching DS5 for events")
+	fmt.Printf("Watching DS5 for events\n")
 	dev.Watch()
 	fmt.Printf("DS5 disappeared\n")
 }

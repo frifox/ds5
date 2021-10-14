@@ -1,15 +1,23 @@
 package ds5
 
-import "fmt"
-
-type Bus string
+type Bus struct {
+	Type     string
+	OnChange func(string)
+}
 
 func (b *Bus) Set(value string) {
 	if value != "bt" && value != "usb" {
 		panic("bus.Set() accepts only 'bt' and 'usb'")
 	}
 
-	*b = Bus(value)
+	if b.Type == value {
+		return
+	}
 
-	fmt.Printf("[BUS] %s\n", *b)
+	b.Type = value
+
+	// callbacks
+	if b.OnChange != nil {
+		go b.OnChange(b.Type)
+	}
 }

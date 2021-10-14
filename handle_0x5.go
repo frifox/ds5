@@ -3,18 +3,12 @@ package ds5
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 )
 
 const PS_FEATURE_CRC32_SEED = 0xA3
 
 const DS_FEATURE_REPORT_CALIBRATION = 0x5
 const DS_FEATURE_REPORT_CALIBRATION_SIZE = 41
-
-const DS_ACC_RES_PER_G = 8192
-const DS_ACC_RANGE = 4 * DS_ACC_RES_PER_G
-const DS_GYRO_RES_PER_DEG_S = 1024
-const DS_GYRO_RANGE = 2048 * DS_GYRO_RES_PER_DEG_S
 
 type Input0x5 struct {
 	ReportID byte
@@ -55,7 +49,7 @@ type InputAccel struct {
 }
 
 func (i *Input0x5) Unmarshal(data []byte) {
-	fmt.Printf("[FeatureReport0x5] Unmarshal len(%d) % X\n", len(data), data)
+	//fmt.Printf("[FeatureReport0x5] Unmarshal len(%d) % X\n", len(data), data)
 
 	reportReader := bytes.NewReader(data)
 	err := binary.Read(reportReader, binary.LittleEndian, i)
@@ -74,57 +68,22 @@ func (d *Device) handle0x5(report []byte) {
 	r := Input0x5{}
 	r.Unmarshal(report)
 
-	return
+	//speed2x := r.InputGyro.SpeedPlus + r.InputGyro.SpeedMinus
+
 	// TODO
+	d.Gyro.pitchCal.Bias = r.InputGyro.PitchBias
+	//d.Gyro.PitchCal.numerator = DS_GYRO_RES_PER_DEG_S * speed2x
+	//d.Gyro.PitchCal.denominator = r.InputGyro.PitchPlus - r.InputGyro.PitchMinus
 
-	var pitchBias, yawBias, rollBias,
-		pitchPlus, pitchMinus,
-		yawPlus, yawMinus,
-		rollPlus, rollMinus,
-		speedPlus, speedMinus,
-		accXPlus, accXMinus,
-		accYPlus, accYMinus,
-		accZPlus, accZMinus int16
+	d.Gyro.yawCal.Bias = r.InputGyro.YawBias
+	//d.Gyro.YawCal.numerator = DS_GYRO_RES_PER_DEG_S * speed2x
+	//d.Gyro.YawCal.denominator = r.InputGyro.YawPlus - r.InputGyro.YawMinus
 
-	// r is 36 bytes long. Read 34 bytes into 17 int16 vars above
-	// last 2 bytes are unknown...
-	b := bytes.NewReader(report)
+	d.Gyro.rollCal.Bias = r.InputGyro.RollBias
+	//d.Gyro.RollCal.numerator = DS_GYRO_RES_PER_DEG_S * speed2x
+	//d.Gyro.RollCal.denominator = r.InputGyro.RollPlus - r.InputGyro.RollMinus
 
-	binary.Read(b, binary.LittleEndian, &pitchBias)
-	binary.Read(b, binary.LittleEndian, &yawBias)
-	binary.Read(b, binary.LittleEndian, &rollBias)
-	fmt.Printf("[Bias] Pitch:%+d Yaw:%+d Roll:%+d\n", pitchBias, yawBias, rollBias)
+	d.Accel.cal = r.InputAccel
 
-	binary.Read(b, binary.LittleEndian, &pitchPlus)
-	binary.Read(b, binary.LittleEndian, &pitchMinus)
-	fmt.Printf("[Pitch] %+d %+d\n", pitchPlus, pitchMinus)
-
-	binary.Read(b, binary.LittleEndian, &yawPlus)
-	binary.Read(b, binary.LittleEndian, &yawMinus)
-	fmt.Printf("[Yaw] %+d %+d\n", yawPlus, yawMinus)
-
-	binary.Read(b, binary.LittleEndian, &rollPlus)
-	binary.Read(b, binary.LittleEndian, &rollMinus)
-	fmt.Printf("[Roll] %+d %+d\n", rollPlus, rollMinus)
-
-	binary.Read(b, binary.LittleEndian, &speedPlus)
-	binary.Read(b, binary.LittleEndian, &speedMinus)
-	fmt.Printf("[Speed] %+d %+d\n", speedPlus, speedMinus)
-
-	// accel
-	binary.Read(b, binary.LittleEndian, &accXPlus)
-	binary.Read(b, binary.LittleEndian, &accXMinus)
-	fmt.Printf("[AccelX] %+d %+d\n", accXPlus, accXMinus)
-
-	binary.Read(b, binary.LittleEndian, &accYPlus)
-	binary.Read(b, binary.LittleEndian, &accYMinus)
-	fmt.Printf("[AccelY] %+d %+d\n", accYPlus, accYMinus)
-
-	binary.Read(b, binary.LittleEndian, &accZPlus)
-	binary.Read(b, binary.LittleEndian, &accZMinus)
-	fmt.Printf("[AccelZ] %+d %+d\n", accZPlus, accZMinus)
-
-	//var misc int16
-	//binary.Read(b, binary.LittleEndian, &misc)
-	//fmt.Printf("[Misc] %+d\n", misc)
+	//fmt.Printf("[%T] %+v\n", d.Gyro, d.Gyro)
 }

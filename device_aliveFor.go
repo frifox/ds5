@@ -15,7 +15,7 @@ func (t *AliveFor) Set(duration time.Duration) {
 	t.Duration = duration
 
 	if t.OnChange != nil {
-		t.OnChange(t.Duration)
+		go t.OnChange(t.Duration)
 	}
 
 }

@@ -39,26 +39,29 @@ func (r *Output0x31) Marshal() []byte {
 		panic("Output0x31 computed CRC integrity failed")
 	}
 
-	fmt.Printf("[%T] % X\n", r, buff.Bytes())
+	//fmt.Printf("[%T] % X\n", r, buff.Bytes())
 
 	return buff.Bytes()
 }
 
-func (d *Device) emit0x31(props ...interface{}) {
+func (d *Device) emit0x31(extra ...interface{}) {
 	r := Output0x31{
 		ReportID: DS_OUTPUT_REPORT_BT,
 		SeqTag:   d.OutputSequencer.Get() << 4, // shift seq to 0xf0
 		Tag:      DS_OUTPUT_TAG,
 	}
 
+	props := []interface{}{
+		d.PlayerLEDs,
+		d.LightBar,
+		d.Rumble,
+		d.Mic,
+	}
+	props = append(props, extra...)
+
 	for _, prop := range props {
 		r.ApplyProp(prop)
 	}
 
-	_, err := d.hid.Write(r.Marshal())
-	if err != nil {
-		fmt.Printf("[%T] ERR SendFeatureReport | %v |len(%d) [%X]\n", r, err, len(r.Marshal()), r.Marshal())
-	} else {
-		//fmt.Printf("[Emit0x31] Sent %d bytes\n", n)
-	}
+	d.writer <- &r
 }

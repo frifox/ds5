@@ -1,5 +1,11 @@
 package ds5
 
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
 type Buttons struct {
 	// right buttons
 	Square   Button
@@ -37,7 +43,11 @@ type Button struct {
 	OnKeyDown func()
 	OnKeyUp   func()
 
-	Release chan bool ``
+	LongPressTimeout time.Duration
+	OnLongPress      func()
+
+	context.Context
+	cancel context.CancelFunc
 }
 
 func (b *Button) Set(state bool) {
@@ -47,11 +57,41 @@ func (b *Button) Set(state bool) {
 
 	b.Pressed = state
 
-	// any callbacks?
+	// generic callbacks?
 	if b.Pressed && b.OnKeyDown != nil {
-		b.OnKeyDown()
+		go b.OnKeyDown()
 	}
 	if !b.Pressed && b.OnKeyUp != nil {
-		b.OnKeyUp()
+		go b.OnKeyUp()
+	}
+
+	// support long press callbacks
+	if b.OnLongPress != nil {
+		if b.LongPressTimeout == 0 {
+			b.LongPressTimeout = time.Second
+		}
+
+		// KeyDown
+		if b.Pressed {
+			b.Context, b.cancel = context.WithTimeout(context.Background(), b.LongPressTimeout)
+
+			go func() {
+				<-b.Done()
+
+				switch b.Err() {
+				case context.DeadlineExceeded:
+					go b.OnLongPress()
+				case context.Canceled:
+					// KeyUp happened before timeout
+				default:
+					fmt.Printf("LongPress unhandled exit reason: %v\n", b.Err())
+				}
+			}()
+		}
+
+		// KeyUp
+		if !b.Pressed {
+			b.cancel()
+		}
 	}
 }

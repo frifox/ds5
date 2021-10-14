@@ -1,6 +1,7 @@
 package ds5
 
 import (
+	"context"
 	"fmt"
 	"github.com/sstallion/go-hid"
 )
@@ -15,6 +16,8 @@ type Device struct {
 	Buttons Buttons
 	Axis    Axis
 	Battery Battery
+	Gyro    Gyro
+	Accel   Accel
 
 	LightBar   LightBar
 	PlayerLEDs PlayerLEDs
@@ -24,7 +27,18 @@ type Device struct {
 	AliveFor        AliveFor
 	OutputSequencer OutputSequencer
 	hid             *hid.Device
+
+	writer chan Report
+
+	context.Context
+	Close context.CancelFunc
 }
+
+type Report interface {
+	Marshal() []byte
+}
+
+type LEDSetup struct{}
 
 func (d *Device) Find() (err error) {
 	d.hid, err = hid.OpenFirst(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS5_CONTROLLER)
@@ -33,6 +47,8 @@ func (d *Device) Find() (err error) {
 		err = fmt.Errorf("%x:%dx not found: %v", USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS5_CONTROLLER, err)
 	}
 
+	d.Context, d.Close = context.WithCancel(context.Background())
+
 	return
 }
 
@@ -40,7 +56,10 @@ func (d *Device) Found() bool {
 	return d.hid != nil
 }
 
-func (d *Device) Watch() {
+func (d *Device) Run() {
+	d.writer = make(chan Report)
+	go d.Writer()
+
 	// by default DS5 sends 0x1 report, which is pretty basic.
 	// requesting CALIBRATION report causes DS5 to send 0x31 report instead,
 	// which includes goodies like Mute/Touch/Gyro/Accel/Battery/etc
@@ -53,62 +72,30 @@ func (d *Device) Watch() {
 		return
 	}
 
-	// pre-apply props
-	d.ApplyProps(LightBarInit{}, d.LightBar, d.PlayerLEDs, d.Rumble)
+	// The hardware may have control over the LEDs (e.g. in Bluetooth on startup).
+	// Reset the LEDs (lightbar, mute, player leds), so we can control them from software.
+	switch d.Bus.Type {
+	case "usb":
+		d.emit0x2(LEDSetup{})
+	case "bt":
+		d.emit0x31(LEDSetup{})
+	}
 
 	//d.GetFeatureReport(DS_FEATURE_REPORT_PAIRING_INFO, DS_FEATURE_REPORT_PAIRING_INFO_SIZE)
 	//d.GetFeatureReport(DS_FEATURE_REPORT_FIRMWARE_INFO, DS_FEATURE_REPORT_FIRMWARE_INFO_SIZE)
 
-	// read input reports 0x1/0x31 as they come in
+	// will block until error
 	d.Reader()
+
+	// done. Close related workers
+	d.Close()
 }
-func (d *Device) ApplyProps(props ...interface{}) {
-	// validate props and save valid values to *Device for reference
-	// then emit0x31() valid props for writing to DS5
-
-	var applied []interface{}
-	for _, prop := range props {
-		switch p := prop.(type) {
-		case LightBarInit:
-			applied = append(applied, p)
-
-		case LightBar:
-			d.LightBar = p
-			applied = append(applied, p)
-		case *LightBar:
-			d.LightBar = *p
-			applied = append(applied, *p)
-
-		case PlayerLEDs:
-			d.PlayerLEDs = p
-			applied = append(applied, p)
-		case *PlayerLEDs:
-			d.PlayerLEDs = *p
-			applied = append(applied, *p)
-
-		case Rumble:
-			d.Rumble = p
-			applied = append(applied, p)
-		case *Rumble:
-			d.Rumble = *p
-			applied = append(applied, *p)
-
-		case Mic:
-			d.Mic = p
-			applied = append(applied, p)
-		case *Mic:
-			d.Mic = *p
-			applied = append(applied, *p)
-		}
-	}
-
-	if len(applied) > 0 {
-		switch d.Bus {
-		case "usb":
-			d.emit0x2(applied...)
-		case "bt":
-			d.emit0x31(applied...)
-		}
+func (d *Device) ApplyProps() {
+	switch d.Bus.Type {
+	case "usb":
+		d.emit0x2()
+	case "bt":
+		d.emit0x31()
 	}
 }
 func (d *Device) GetFeatureReport(id uint8) []byte {
@@ -150,5 +137,25 @@ func (d *Device) Reader() {
 			fmt.Printf("[InputReport] UNKNOWN len(%d) % X\n", len(report), report)
 		}
 
+	}
+}
+
+func (d *Device) Writer() {
+loop:
+	for {
+		select {
+		case report := <-d.writer:
+			data := report.Marshal()
+
+			_, err := d.hid.Write(data)
+			if err != nil {
+				fmt.Printf("[%T] ERR hid.Write | %v |len(%d) [%X]\n", report, err, data, data)
+			} else {
+				//fmt.Printf("[Emit0x31 #%d] Send %d Bytes. Len(%d) [%X]\n", goID(), n, len(data), data)
+			}
+		case <-d.Done():
+			// shut down
+			break loop
+		}
 	}
 }

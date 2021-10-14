@@ -25,8 +25,8 @@ type Input0x31 struct {
 	Buttons  [4]byte
 	Reserved [4]byte
 
-	Gyro      [3]uint16
-	Accel     [3]uint16
+	Gyro      [3]int16
+	Accel     [3]int16
 	Timestamp uint32
 	Reserved2 byte
 
@@ -129,7 +129,23 @@ func (d *Device) handle0x31(report []byte) {
 	d.Buttons.Touchpad.Set(r.Buttons[2]>>1&1 == 1)
 	d.Buttons.Mute.Set(r.Buttons[2]>>2&1 == 1)
 
-	// TODO Gyro, Accel
+	{
+		// TODO
+		pitch := float64(r.Gyro[0] - d.Gyro.pitchCal.Bias)
+		yaw := float64(r.Gyro[1] - d.Gyro.yawCal.Bias)
+		roll := float64(r.Gyro[2] - d.Gyro.rollCal.Bias)
+		d.Gyro.Set(pitch, yaw, roll)
+	}
+	{
+		xMax := float64(d.Accel.cal.XPlus+-d.Accel.cal.XMinus) / 2
+		yMax := float64(d.Accel.cal.YPlus+-d.Accel.cal.YMinus) / 2
+		zMax := float64(d.Accel.cal.ZPlus+-d.Accel.cal.ZMinus) / 2
+
+		x := float64(r.Accel[0]) / xMax
+		y := float64(r.Accel[1]) / yMax
+		z := float64(r.Accel[2]) / zMax
+		d.Accel.Set(x, y, z)
+	}
 
 	// 1 r.Timestamp = 1/3 microseconds
 	aliveFor := time.Duration(float64(time.Microsecond) * float64(r.Timestamp) / 3)

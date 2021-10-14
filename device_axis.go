@@ -43,7 +43,7 @@ func (j *Joystick) Set(x uint8, y uint8) {
 
 	// any callbacks?
 	if j.OnChange != nil {
-		j.OnChange(j.X, j.Y)
+		go j.OnChange(j.X, j.Y)
 	}
 }
 
@@ -65,6 +65,6 @@ func (t *Throttle) Set(z uint8) {
 
 	// any callbacks?
 	if t.OnChange != nil {
-		t.OnChange(t.Z)
+		go t.OnChange(t.Z)
 	}
 }

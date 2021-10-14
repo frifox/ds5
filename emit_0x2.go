@@ -33,19 +33,22 @@ func (r *Output0x2) Marshal() []byte {
 	return buff.Bytes()
 }
 
-func (d *Device) emit0x2(props ...interface{}) {
+func (d *Device) emit0x2(extra ...interface{}) {
 	r := Output0x2{
 		ReportID: DS_OUTPUT_REPORT_USB,
 	}
+
+	props := []interface{}{
+		d.PlayerLEDs,
+		d.LightBar,
+		d.Rumble,
+		d.Mic,
+	}
+	props = append(props, extra...)
 
 	for _, prop := range props {
 		r.ApplyProp(prop)
 	}
 
-	_, err := d.hid.Write(r.Marshal())
-	if err != nil {
-		fmt.Printf("[%T] ERR SendFeatureReport | %v |len(%d) [%X]\n", r, err, len(r.Marshal()), r.Marshal())
-	} else {
-		//fmt.Printf("[Emit0x2] Sent %d bytes\n", n)
-	}
+	d.writer <- &r
 }

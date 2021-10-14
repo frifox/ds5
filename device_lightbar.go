@@ -6,9 +6,6 @@ type LightBar struct {
 	Green uint8
 	Blue  uint8
 }
-type LightBarInit struct {
-	// empty
-}
 
 func (l *LightBar) Set(r uint8, g uint8, b uint8) {
 	l.Red = r

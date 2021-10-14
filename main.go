@@ -7,6 +7,8 @@ import (
 	"github.com/sstallion/go-hid"
 	"hash/crc32"
 	"math"
+	"runtime"
+	"strconv"
 )
 
 func PrintAllHIDs() {
@@ -111,4 +113,13 @@ func ReportCRC(seed uint8, report interface{}) uint32 {
 	seededData := append([]byte{seed}, data...)
 
 	return crc32.ChecksumIEEE(seededData)
+}
+
+func goID() uint64 {
+	b := make([]byte, 64)
+	b = b[:runtime.Stack(b, false)]
+	b = bytes.TrimPrefix(b, []byte("goroutine "))
+	b = b[:bytes.IndexByte(b, ' ')]
+	n, _ := strconv.ParseUint(string(b), 10, 64)
+	return n
 }
