@@ -104,13 +104,14 @@ How fast you change Pitch, Roll, and Yaw.
         Yaw      float64
     }
 
-Values are -1 to +1:
+Values are -1 to +1.
 
-* Pitch: -1 down, +1 up
-* Yaw: -1 left, +1 right
-* Roll: -1 left, +1 right
+Pitch: -1 down, +1 up
 
-    
+Yaw: -1 left, +1 right
+
+Roll: -1 left, +1 right
+
     dev.Gyro.OnChange = func(pitch, yaw, roll float64) {
         fmt.Printf("Gyroscope: Pitch: %.3f | Yaw: %.3f | Roll: %.3f\n", pitch, yaw, roll)     
     }
@@ -119,9 +120,11 @@ Values are -1 to +1:
 
 How much gravity is pulling on an axis. Axis in-line with gravity = -1 / +1, axis perpendicular with gravity = 0;
 
-* X: left to right (ie: Roll)
-* Y: bottom to top (ie: Orientation)
-* Z: front to back (ie: Pitch)
+X: left to right (ie: Roll)
+
+Y: bottom to top (ie: Orientation)
+
+Z: front to back (ie: Pitch)
 
     
     dev.Accel.OnChange = func(x, y, z float64) {
