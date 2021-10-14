@@ -112,8 +112,8 @@ Yaw: -1 left, +1 right
 
 Roll: -1 left, +1 right
 
-    dev.Gyro.OnChange = func(pitch, yaw, roll float64) {
-        fmt.Printf("Gyroscope: Pitch: %.3f | Yaw: %.3f | Roll: %.3f\n", pitch, yaw, roll)     
+    dev.Gyro.OnChange = func(g *ds5.Gyro) {
+        fmt.Printf("Gyroscope: Pitch: %.3f | Roll: %.3f | Yaw: %.3f\n", g.Pitch, g.Roll, g.Yaw)     
     }
 
 ## Accel
@@ -127,8 +127,8 @@ Y: bottom to top (ie: Orientation)
 Z: front to back (ie: Pitch)
 
     
-    dev.Accel.OnChange = func(x, y, z float64) {
-        fmt.Printf("Accelerometer: X: %.3f | Y: %.3f | Z: %.3f\n", x, y, z)     
+    dev.Accel.OnChange = func(a *ds5.Accel) {
+        fmt.Printf("Accelerometer: X: %.3f | Y: %.3f | Z: %.3f\n", a.X, a.Y, a.Z)     
     }
 
 ## Touchpad

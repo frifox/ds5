@@ -38,8 +38,8 @@ func (g *Gyro) Set(pitch, yaw, roll float64) {
 
 	// TODO normalize number to something meaningful
 	g.Pitch = pitch // -down, +up
-	g.Yaw = -yaw    // -left, +right
 	g.Roll = -roll  // -left, +right
+	g.Yaw = -yaw    // -left, +right
 
 	if g.OnChange != nil {
 		go g.OnChange(*g)
