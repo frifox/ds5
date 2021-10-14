@@ -22,7 +22,7 @@ Full RGB lightbar around the touchpad.
         Blue  uint8
     }
 
-Pass appropriate property to device.ApplyProps() to apply new state on the controller. Ex:
+Note: run ApplyProps() to apply values on the controller. If changing multiple props at once, call ApplyProps() after all updates are done, to avoid unnecessarily sending multiple packets to DS5.
 
     // set new state
     dev.LightBar = ds5.LightBar{
