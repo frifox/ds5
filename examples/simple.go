@@ -12,20 +12,22 @@ func main() {
 		return
 	}
 
-	dev.Buttons.Cross.OnKeyDown = func() {
-		fmt.Printf("X pressed\n")
+	dev.Buttons.Square.OnKeyDown = func() {
+		fmt.Printf("Square pressed\n")
 
 		dev.LightBar.SetRed()
 		dev.ApplyProps()
 	}
-	dev.Buttons.Cross.OnKeyUp = func() {
-		fmt.Printf("X released\n")
+	dev.Buttons.Square.OnKeyUp = func() {
+		fmt.Printf("Square released\n")
 
 		dev.LightBar.SetGreen()
 		dev.ApplyProps()
 	}
 
 	fmt.Printf("Watching DS5 for events\n")
-	dev.Watch()
+	go dev.Run()
+
+	<-dev.Done()
 	fmt.Printf("DS5 disappeared\n")
 }
