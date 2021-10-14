@@ -8,6 +8,9 @@ This package uses [sstallion/go-hid](https://github.com/sstallion/go-hid) which 
 
 [signal11/hidapi](https://github.com/signal11/hidapi) is a multi-platform C library for interfacing with USB/BT HID-Class devices.
 
+PS: Linux: `apt-get install libhidapi-dev libudev-dev`
+
+PS: MacOS: `brew install hidapi`
 # Usage
 For working examples, check [/example](https://github.com/frifox/ds5/tree/master/example) folder.
     
