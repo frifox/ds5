@@ -4,13 +4,12 @@ Heavily based on the official [hid-playstation](https://github.com/torvalds/linu
 
 ## Linux / MacOS
 
-This package uses [sstallion/go-hid](https://github.com/sstallion/go-hid) which provides Go bindings for [signal11/hidapi](https://github.com/signal11/hidapi).
+* This package uses [sstallion/go-hid](https://github.com/sstallion/go-hid) which provides Go bindings for [signal11/hidapi](https://github.com/signal11/hidapi).
+* [signal11/hidapi](https://github.com/signal11/hidapi) is a multi-platform C library for interfacing with USB/BT HID-Class devices.
+* Linux: `apt-get install libhidapi-dev libudev-dev`
+* MacOS: `brew install hidapi`
+* Windows: I don't have one to test...
 
-[signal11/hidapi](https://github.com/signal11/hidapi) is a multi-platform C library for interfacing with USB/BT HID-Class devices.
-
-PS: Linux: `apt-get install libhidapi-dev libudev-dev`
-
-PS: MacOS: `brew install hidapi`
 # Usage
 For working examples, check [examples](https://github.com/frifox/ds5/tree/master/examples) folder.
     
