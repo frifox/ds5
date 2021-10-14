@@ -1,5 +1,24 @@
+##
+    type Device struct {
+        //
+
+        Bus      Bus
+        AliveFor AliveFor
+        Battery  Battery
+    
+        Buttons  Buttons
+        Axis     Axis
+        Touchpad Touchpad
+        Gyro     Gyro
+        Accel    Accel
+
+        //
+    }
+
+    // this doc will refer to Device as `dev`
+    var dev ds5.Device
+
 ## Buttons
-    // ds5.Device.Buttons
     type Buttons struct {
         // right buttons
         Square   Button
@@ -19,11 +38,11 @@
         Options  Button
         PS       Button
         Mute     Button
-
-        // back of controller    
+    
+        // back of controller
         L1 Button
         R1 Button
-
+    
         L2 Button
         R2 Button
     
@@ -31,16 +50,29 @@
         Left  Button
         Right Button
     }
-
-Buttons have `KeyDown` / `KeyUp` callbacks. Ex:
+    
+Buttons have `KeyDown` / `KeyUp` / `OnLongPress` callbacks. `OnLongPress` will trigger as soon as `LongPressTimeout` is reached after `KeyDown`. If all 3 callbacks are assigned, all 3 can and will trigger at their respective events
 
     x := &dev.Buttons.Cross
+
 	x.OnKeyDown = func() {
 		fmt.Println("X pressed")
 	}
 	x.OnKeyUp = func() {
 		fmt.Println("X released")
 	}
+    x.OnLongPress = func() {
+        fmt.Println("X was held for 1s")
+    }
+
+PS: `LongPressTimeout` defaults to 1 sec. You can change it, ex:
+
+    x.LongPressTimeout = time.Duration(time.Millisecond * 500)
+    x.OnLongPress = func() {
+        fmt.Println("X was held for 500ms")
+    }
+    
+    
 
 ## Joysticks / Throttles
     // ds5.Device.Axis
@@ -57,9 +89,11 @@ Axis have `OnChange` callbacks. Ex:
     dev.Axis.Left.OnChange = func(x, y float64) {
         fmt.Printf("Left Joystic X:%.3f Y:%.3f\n", x, y)
     }
-    dev.Axis.Right.OnChange = func(x, y float64) {
-        fmt.Printf("Right Joystic X:%.3f Y:%.3f\n", x, y)
+
+    dev.Axis.L1.OnChange = func(z float64) {
+        fmt.Printf("L1 throttle: %.3f\n", z)
     }
+    
 
 ## Touchpad
 Track 1 or 2 finger touches across a 1920x1080 touchpad

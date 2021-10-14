@@ -39,12 +39,12 @@ type Buttons struct {
 }
 
 type Button struct {
-	Pressed   bool
-	OnKeyDown func()
-	OnKeyUp   func()
+	Pressed     bool
+	OnKeyDown   func()
+	OnKeyUp     func()
+	OnLongPress func()
 
 	LongPressTimeout time.Duration
-	OnLongPress      func()
 
 	context.Context
 	cancel context.CancelFunc

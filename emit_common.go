@@ -14,9 +14,9 @@ const DS_OUTPUT_VALID_FLAG1_PLAYER_INDICATOR_CONTROL_ENABLE = 1 << 4
 const DS_OUTPUT_VALID_FLAG2_LIGHTBAR_SETUP_CONTROL_ENABLE = 1 << 1
 const DS_OUTPUT_LIGHTBAR_SETUP_LIGHT_OUT = 1 << 1
 
-type OutputSequencer uint8
+type outputSequencer uint8
 
-func (s *OutputSequencer) Get() uint8 {
+func (s *outputSequencer) Get() uint8 {
 	seq := *s     // return current seq
 	*s++          // next seq
 	*s = *s & 0xf // truncate it to uint4 (0 to 15)

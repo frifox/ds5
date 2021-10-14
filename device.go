@@ -11,21 +11,21 @@ const USB_DEVICE_ID_SONY_PS5_CONTROLLER = 0xce6
 
 type Device struct {
 	Bus      Bus
-	Touchpad Touchpad
+	AliveFor AliveFor
+	Battery  Battery
 
-	Buttons Buttons
-	Axis    Axis
-	Battery Battery
-	Gyro    Gyro
-	Accel   Accel
+	Buttons  Buttons
+	Axis     Axis
+	Touchpad Touchpad
+	Gyro     Gyro
+	Accel    Accel
 
 	LightBar   LightBar
 	PlayerLEDs PlayerLEDs
 	Mic        Mic
 	Rumble     Rumble
 
-	AliveFor        AliveFor
-	OutputSequencer OutputSequencer
+	outputSequencer outputSequencer
 	hid             *hid.Device
 
 	writer chan Report

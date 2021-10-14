@@ -47,7 +47,7 @@ func (r *Output0x31) Marshal() []byte {
 func (d *Device) emit0x31(extra ...interface{}) {
 	r := Output0x31{
 		ReportID: DS_OUTPUT_REPORT_BT,
-		SeqTag:   d.OutputSequencer.Get() << 4, // shift seq to 0xf0
+		SeqTag:   d.outputSequencer.Get() << 4, // shift seq to 0xf0
 		Tag:      DS_OUTPUT_TAG,
 	}
 
