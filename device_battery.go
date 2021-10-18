@@ -3,7 +3,7 @@ package ds5
 type Battery struct {
 	Percent  uint8
 	Status   string
-	OnChange func()
+	OnChange func(Battery)
 }
 
 func (b *Battery) Set(status string, percent uint8) {
@@ -16,6 +16,6 @@ func (b *Battery) Set(status string, percent uint8) {
 
 	// any callbacks?
 	if b.OnChange != nil {
-		go b.OnChange()
+		go b.OnChange(*b)
 	}
 }

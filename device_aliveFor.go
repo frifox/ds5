@@ -4,7 +4,7 @@ import "time"
 
 type AliveFor struct {
 	Duration time.Duration
-	OnChange func(time.Duration)
+	OnChange func(AliveFor)
 }
 
 func (t *AliveFor) Set(duration time.Duration) {
@@ -15,7 +15,7 @@ func (t *AliveFor) Set(duration time.Duration) {
 	t.Duration = duration
 
 	if t.OnChange != nil {
-		go t.OnChange(t.Duration)
+		go t.OnChange(*t)
 	}
 
 }

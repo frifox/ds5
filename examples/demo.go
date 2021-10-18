@@ -179,18 +179,18 @@ func setBackButtonsCallbacks() {
 }
 
 func setAxisCallbacks() {
-	dev.Axis.Left.OnChange = func(x float64, y float64) {
-		fmt.Printf("[Left] X:%.3f Y:%.3f\n", x, y)
+	dev.Axis.Left.OnChange = func(a ds5.Joystick) {
+		fmt.Printf("[Left] X:%.3f Y:%.3f\n", a.X, a.Y)
 	}
-	dev.Axis.Right.OnChange = func(x float64, y float64) {
-		fmt.Printf("[Right] X:%.3f Y:%.3f\n", x, y)
+	dev.Axis.Right.OnChange = func(a ds5.Joystick) {
+		fmt.Printf("[Right] X:%.3f Y:%.3f\n", a.X, a.Y)
 	}
 
-	dev.Axis.L2.OnChange = func(z float64) {
-		fmt.Printf("[L2] Z:%.3f\n", z)
+	dev.Axis.L2.OnChange = func(a ds5.Throttle) {
+		fmt.Printf("[L2] Z:%.3f\n", a.Z)
 	}
-	dev.Axis.R2.OnChange = func(z float64) {
-		fmt.Printf("[R2] Z:%.3f\n", z)
+	dev.Axis.R2.OnChange = func(a ds5.Throttle) {
+		fmt.Printf("[R2] Z:%.3f\n", a.Z)
 	}
 }
 func setTouchCallbacks() {
@@ -223,10 +223,10 @@ func setTouchCallbacks() {
 	b.Max = max(b.Home, b.Far)
 
 	t1 := &dev.Touchpad.Touch1
-	t1.OnActive = func(id uint8, x int, y int) {
-		R := ds5.ConvertRange(0, r.Max, 255, 0, t1.DistanceTo(r.Home.X, r.Home.Y))
-		G := ds5.ConvertRange(0, g.Max, 255, 0, t1.DistanceTo(g.Home.X, g.Home.Y))
-		B := ds5.ConvertRange(0, b.Max, 255, 0, t1.DistanceTo(b.Home.X, b.Home.Y))
+	t1.OnActive = func(t ds5.Touch) {
+		R := ds5.ConvertRange(0, r.Max, 255, 0, t.DistanceTo(r.Home.X, r.Home.Y))
+		G := ds5.ConvertRange(0, g.Max, 255, 0, t.DistanceTo(g.Home.X, g.Home.Y))
+		B := ds5.ConvertRange(0, b.Max, 255, 0, t.DistanceTo(b.Home.X, b.Home.Y))
 
 		dev.LightBar.Red = uint8(R)
 		dev.LightBar.Green = uint8(G)
@@ -237,17 +237,17 @@ func setTouchCallbacks() {
 	}
 
 	t2 := &dev.Touchpad.Touch2
-	t2.OnActive = func(id uint8, x int, y int) {
-		fmt.Printf("[Touch2] ID:%d X:%d Y:%d\n", id, x, y)
+	t2.OnActive = func(t ds5.Touch) {
+		fmt.Printf("[Touch2] ID:%d X:%d Y:%d\n", t.ID, t.X, t.Y)
 	}
-	t2.OnInactive = func(id uint8) {
-		fmt.Printf("[Touch2] ID:%d Inactive\n", id)
+	t2.OnInactive = func(t ds5.Touch) {
+		fmt.Printf("[Touch2] ID:%d Inactive\n", t.ID)
 	}
 }
 
 func setMiscCallbacks() {
-	dev.Battery.OnChange = func() {
-		fmt.Printf("[Battery] %s (%d%%)\n", dev.Battery.Status, dev.Battery.Percent)
+	dev.Battery.OnChange = func(b ds5.Battery) {
+		fmt.Printf("[Battery] %s (%d%%)\n", b.Status, b.Percent)
 	}
 
 	//dev.AliveFor.OnChange = func(t time.Duration) {

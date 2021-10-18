@@ -16,7 +16,7 @@ type Joystick struct {
 
 	X        float64
 	Y        float64
-	OnChange func(float64, float64)
+	OnChange func(Joystick)
 }
 
 func (j *Joystick) Set(x uint8, y uint8) {
@@ -43,13 +43,13 @@ func (j *Joystick) Set(x uint8, y uint8) {
 
 	// any callbacks?
 	if j.OnChange != nil {
-		go j.OnChange(j.X, j.Y)
+		go j.OnChange(*j)
 	}
 }
 
 type Throttle struct {
 	Z        float64
-	OnChange func(float64)
+	OnChange func(Throttle)
 }
 
 func (t *Throttle) Set(z uint8) {
@@ -65,6 +65,6 @@ func (t *Throttle) Set(z uint8) {
 
 	// any callbacks?
 	if t.OnChange != nil {
-		go t.OnChange(t.Z)
+		go t.OnChange(*t)
 	}
 }

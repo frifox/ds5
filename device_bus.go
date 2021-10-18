@@ -2,7 +2,7 @@ package ds5
 
 type Bus struct {
 	Type     string
-	OnChange func(string)
+	OnChange func(Bus)
 }
 
 func (b *Bus) Set(value string) {
@@ -18,6 +18,6 @@ func (b *Bus) Set(value string) {
 
 	// callbacks
 	if b.OnChange != nil {
-		go b.OnChange(b.Type)
+		go b.OnChange(*b)
 	}
 }

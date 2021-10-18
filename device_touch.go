@@ -12,8 +12,8 @@ type Touch struct {
 	Active     bool
 	X          int
 	Y          int
-	OnActive   func(*Touch)
-	OnInactive func(*Touch)
+	OnActive   func(Touch)
+	OnInactive func(Touch)
 }
 
 func (t *Touch) Set(id uint8, active bool, x int, y int) {
@@ -28,10 +28,10 @@ func (t *Touch) Set(id uint8, active bool, x int, y int) {
 
 	// any callbacks
 	if t.Active && t.OnActive != nil {
-		go t.OnActive(t)
+		go t.OnActive(*t)
 	}
 	if !t.Active && t.OnInactive != nil {
-		go t.OnInactive(t)
+		go t.OnInactive(*t)
 	}
 }
 func (t *Touch) DistanceTo(x float64, y float64) float64 {
