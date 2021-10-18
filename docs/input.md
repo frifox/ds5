@@ -86,12 +86,12 @@ PS: `LongPressTimeout` defaults to 1 sec. You can change it, ex:
 
 Axis have `OnChange` callbacks. Ex:
 
-    dev.Axis.Left.OnChange = func(x, y float64) {
-        fmt.Printf("Left Joystic X:%.3f Y:%.3f\n", x, y)
+    dev.Axis.Left.OnChange = func(j ds5.Joystick) {
+        fmt.Printf("Left Joystic X:%.3f Y:%.3f\n", j.X, j.Y)
     }
 
-    dev.Axis.L1.OnChange = func(z float64) {
-        fmt.Printf("L1 throttle: %.3f\n", z)
+    dev.Axis.L1.OnChange = func(t ds5.Throttle) {
+        fmt.Printf("L1 throttle: %.3f\n", t.Z)
     }
 
 ## Gyro
@@ -112,7 +112,7 @@ Yaw: -1 left, +1 right
 
 Roll: -1 left, +1 right
 
-    dev.Gyro.OnChange = func(g *ds5.Gyro) {
+    dev.Gyro.OnChange = func(g ds5.Gyro) {
         fmt.Printf("Gyroscope: Pitch: %.3f | Roll: %.3f | Yaw: %.3f\n", g.Pitch, g.Roll, g.Yaw)     
     }
 
@@ -127,7 +127,7 @@ Y: bottom to top (ie: Orientation)
 Z: front to back (ie: Pitch)
 
     
-    dev.Accel.OnChange = func(a *ds5.Accel) {
+    dev.Accel.OnChange = func(a ds5.Accel) {
         fmt.Printf("Accelerometer: X: %.3f | Y: %.3f | Z: %.3f\n", a.X, a.Y, a.Z)     
     }
 
@@ -142,10 +142,10 @@ Track 1 or 2 finger touches across a 1920x1080 touchpad
 Touches have `OnActive` / `OnInactive` callbacks. Ex:
 
     t1 := &dev.Touchpad.Touch1
-	t1.OnActive = func(t *ds5.Touch) {
+	t1.OnActive = func(t ds5.Touch) {
 		fmt.Printf("Touch1 Active [ID:%d X:%d Y:%d]\n", t.ID, t.X, t.Y)
 	}
-	t1.OnInactive = func(t *ds5.Touch) {
+	t1.OnInactive = func(t ds5.Touch) {
 		fmt.Printf("Touch1 Inactive [ID:%d]\n", t.ID)
 	}
 
@@ -160,8 +160,8 @@ Monitor controller battery status and whether it's currently charging or not.
 
 You can monitor changes (see [src](https://github.com/frifox/ds5/blob/master/handle_0x31.go#L167) for details) via `OnChange` callback, ex:
 
-    dev.Battery.OnChange = func() {
-		fmt.Printf("Battery is %s (%d%%)\n", dev.Battery.Status, dev.Battery.Percent)
+    dev.Battery.OnChange = func(b ds5.Battery) {
+		fmt.Printf("Battery is %s (%d%%)\n", b.Status, b.Percent)
 	}
 
 ## Bus
@@ -172,8 +172,8 @@ You can monitor changes (see [src](https://github.com/frifox/ds5/blob/master/han
 
 Data packets over BT are CRC32 signed and packets over USB are not. Bus value is set to `bt` / `usb` every time `dev.Watch()` is called, where packet crc is checked for the first time.
 
-    dev.Bus.OnChange = func() {
-		fmt.Printf("DS5 is now connected via %s\n", dev.Bus.Type)
+    dev.Bus.OnChange = func(b ds5.Bus) {
+		fmt.Printf("DS5 is now connected via %s\n", b.Type)
 	}
     
 
@@ -187,6 +187,6 @@ As reported by the controller. For less verbosity I round this event value to th
 
 Bind to OnChange event ex:
 
-    dev.AliveFor.OnChange = func(t time.Duration) {
-    	fmt.Printf("AliveFor %s\n", t.String())
+    dev.AliveFor.OnChange = func(a ds5.AliveFor) {
+    	fmt.Printf("AliveFor %s\n", a.Duration.String())
     }
