@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/sstallion/go-hid"
+	"time"
 )
 
 const USB_VENDOR_ID_SONY = 0x54c
@@ -141,7 +142,8 @@ func (d *Device) Reader() {
 }
 
 func (d *Device) Writer() {
-loop:
+	keepAlive := time.NewTicker(time.Minute)
+
 	for {
 		select {
 		case report := <-d.writer:
@@ -153,9 +155,14 @@ loop:
 			} else {
 				//fmt.Printf("[Emit0x31 #%d] Send %d Bytes. Len(%d) [%X]\n", goID(), n, len(data), data)
 			}
+
+		// ds5 KeepAlive
+		case <-keepAlive.C:
+			d.ApplyProps()
+
+		// shut down
 		case <-d.Done():
-			// shut down
-			break loop
+			return
 		}
 	}
 }
