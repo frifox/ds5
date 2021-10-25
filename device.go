@@ -158,6 +158,7 @@ func (d *Device) Writer() {
 
 		// ds5 KeepAlive
 		case <-keepAlive.C:
+			fmt.Printf("KeepAlive\n")
 			d.ApplyProps()
 
 		// shut down
