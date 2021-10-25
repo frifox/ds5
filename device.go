@@ -163,6 +163,7 @@ func (d *Device) Writer() {
 
 		// shut down
 		case <-d.Done():
+			keepAlive.Stop()
 			return
 		}
 	}
