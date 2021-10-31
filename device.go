@@ -64,14 +64,7 @@ func (d *Device) Run() {
 	// by default DS5 sends 0x1 report, which is pretty basic.
 	// requesting CALIBRATION report causes DS5 to send 0x31 report instead,
 	// which includes goodies like Mute/Touch/Gyro/Accel/Battery/etc
-	report0x5 := d.GetFeatureReport(DS_FEATURE_REPORT_CALIBRATION)
-	switch len(report0x5) {
-	case DS_FEATURE_REPORT_CALIBRATION_SIZE:
-		d.handle0x5(report0x5)
-	default:
-		fmt.Printf("Unknown report0x5 len(%d)\n", len(report0x5))
-		return
-	}
+	d.Reload0x5()
 
 	// The hardware may have control over the LEDs (e.g. in Bluetooth on startup).
 	// Reset the LEDs (lightbar, mute, player leds), so we can control them from software.
@@ -90,6 +83,17 @@ func (d *Device) Run() {
 
 	// done. Close related workers
 	d.Close()
+}
+func (d *Device) Reload0x5() (ok bool) {
+	report0x5 := d.GetFeatureReport(DS_FEATURE_REPORT_CALIBRATION)
+	switch len(report0x5) {
+	case DS_FEATURE_REPORT_CALIBRATION_SIZE:
+		d.handle0x5(report0x5)
+		return true
+	default:
+		fmt.Printf("Unknown report0x5 len(%d)\n", len(report0x5))
+	}
+	return false
 }
 func (d *Device) ApplyProps() {
 	switch d.Bus.Type {
@@ -158,8 +162,10 @@ func (d *Device) Writer() {
 
 		// ds5 KeepAlive
 		case <-keepAlive.C:
-			fmt.Printf("KeepAlive\n")
-			d.ApplyProps()
+			fmt.Printf("KeepAlive: Reload0x5\n")
+			if !d.Reload0x5() {
+				fmt.Printf("KeepAlive: Reload0x5 failed\n")
+			}
 
 		// shut down
 		case <-d.Done():
