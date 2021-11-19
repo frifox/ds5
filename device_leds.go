@@ -7,6 +7,11 @@ func (l *PlayerLEDs) AllOff() {
 		l[id] = false
 	}
 }
+func (l *PlayerLEDs) AllOn() {
+	for id, _ := range l {
+		l[id] = true
+	}
+}
 
 //  mimic PS5 behavior
 var ledPlayerMap = map[uint8][]uint8{
@@ -40,6 +45,25 @@ var ledBarMap = map[uint8][]uint8{
 func (l *PlayerLEDs) SetBar(count uint8) {
 	l.AllOff()
 	if leds, exists := ledBarMap[count]; exists {
+		for _, id := range leds {
+			l[id] = true
+		}
+	}
+}
+
+// marquee
+var dotMap = map[uint8][]uint8{
+	0: {},  // _____
+	1: {0}, // X____
+	2: {1}, // _X___
+	3: {2}, // __X__
+	4: {3}, // ___X_
+	5: {4}, // ____X
+}
+
+func (l *PlayerLEDs) SetDot(count uint8) {
+	l.AllOff()
+	if leds, exists := dotMap[count]; exists {
 		for _, id := range leds {
 			l[id] = true
 		}

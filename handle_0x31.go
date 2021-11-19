@@ -63,19 +63,14 @@ func (r *Input0x31) Marshal() []byte {
 	return buff.Bytes()
 }
 
-func (d *Device) handle0x31(report []byte) {
-	if !ReportCRCIsValid(PS_INPUT_CRC32_SEED, report) {
-		fmt.Printf("ERR CRC check failed [% X]\n", report)
-		return
+// handle0x31 handles input sensor states (bt only)
+func (d *Device) handle0x31(data []byte) {
+	if !ReportCRCIsValid(PS_INPUT_CRC32_SEED, data) {
+		fmt.Printf("ERR handle0x31 CRC check failed [% X]\n", data)
 	}
 
 	r := Input0x31{}
-	r.Unmarshal(report)
-
-	// sanity check
-	if !bytes.Equal(report, r.Marshal()) {
-		fmt.Printf("ERR Input0x31 sanity check [%X] != [%X], %+v\n", report, r.Marshal(), r)
-	}
+	r.Unmarshal(data)
 
 	d.Axis.Left.Set(r.LeftX, r.LeftY)
 	d.Axis.Right.Set(r.RightX, r.RightY)
@@ -199,4 +194,6 @@ func (d *Device) handle0x31(report []byte) {
 	default:
 		d.Battery.Set("Unknown", 0)
 	}
+
+	//fmt.Printf("[%T] %#v\n", r, r)
 }

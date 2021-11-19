@@ -12,6 +12,7 @@ const USB_DEVICE_ID_SONY_PS5_CONTROLLER = 0xce6
 
 type Device struct {
 	Bus      Bus
+	Info     Info
 	AliveFor AliveFor
 	Battery  Battery
 
@@ -61,22 +62,22 @@ func (d *Device) Run() {
 	d.writer = make(chan Report)
 	go d.Writer()
 
+	// get MAC address, useful for automated BT pairing later on
+	d.Reload0x9()
+
 	// by default DS5 sends 0x1 report, which is pretty basic.
 	// requesting CALIBRATION report causes DS5 to send 0x31 report instead,
 	// which includes goodies like Mute/Touch/Gyro/Accel/Battery/etc
 	d.Reload0x5()
 
 	// The hardware may have control over the LEDs (e.g. in Bluetooth on startup).
-	// Reset the LEDs (lightbar, mute, player leds), so we can control them from software.
+	// Reset the LEDs (lightbar, mute, player leds), so we can control them later.
 	switch d.Bus.Type {
 	case "usb":
 		d.emit0x2(LEDSetup{})
 	case "bt":
 		d.emit0x31(LEDSetup{})
 	}
-
-	//d.GetFeatureReport(DS_FEATURE_REPORT_PAIRING_INFO, DS_FEATURE_REPORT_PAIRING_INFO_SIZE)
-	//d.GetFeatureReport(DS_FEATURE_REPORT_FIRMWARE_INFO, DS_FEATURE_REPORT_FIRMWARE_INFO_SIZE)
 
 	// will block until error
 	d.Reader()
@@ -85,13 +86,35 @@ func (d *Device) Run() {
 	d.Close()
 }
 func (d *Device) Reload0x5() (ok bool) {
-	report0x5 := d.GetFeatureReport(DS_FEATURE_REPORT_CALIBRATION)
-	switch len(report0x5) {
+	data := d.GetFeatureReport(DS_FEATURE_REPORT_CALIBRATION)
+	switch len(data) {
 	case DS_FEATURE_REPORT_CALIBRATION_SIZE:
-		d.handle0x5(report0x5)
+		d.handle0x5(data)
 		return true
 	default:
-		fmt.Printf("Unknown report0x5 len(%d)\n", len(report0x5))
+		fmt.Printf("Unknown report0x5 len(%d)\n", len(data))
+	}
+	return false
+}
+func (d *Device) Reload0x9() (ok bool) {
+	data := d.GetFeatureReport(DS_FEATURE_REPORT_PAIRING_INFO)
+	switch len(data) {
+	case DS_FEATURE_REPORT_PAIRING_INFO_SIZE:
+		d.handle0x9(data)
+		return true
+	default:
+		fmt.Printf("Unknown report0x9 len(%d)\n", len(data))
+	}
+	return false
+}
+func (d *Device) Reload0x20() (ok bool) {
+	data := d.GetFeatureReport(DS_FEATURE_REPORT_FIRMWARE_INFO)
+	switch len(data) {
+	case DS_FEATURE_REPORT_FIRMWARE_INFO_SIZE:
+		d.handle0x20(data)
+		return true
+	default:
+		fmt.Printf("Unknown report0x20 len(%d)\n", len(data))
 	}
 	return false
 }
@@ -110,6 +133,7 @@ func (d *Device) GetFeatureReport(id uint8) []byte {
 	n, err := d.hid.GetFeatureReport(report)
 	if err != nil {
 		fmt.Printf("ERR GetFeatureReport(0x%X): %v\n", id, err)
+		return nil
 	}
 
 	// trim report what we actually read
@@ -151,20 +175,20 @@ func (d *Device) Writer() {
 	for {
 		select {
 		case report := <-d.writer:
+			//fmt.Printf("[DS.Write] %#v\n", report)
+
 			data := report.Marshal()
 
 			_, err := d.hid.Write(data)
 			if err != nil {
 				fmt.Printf("[%T] ERR hid.Write | %v |len(%d) [%X]\n", report, err, data, data)
-			} else {
-				//fmt.Printf("[Emit0x31 #%d] Send %d Bytes. Len(%d) [%X]\n", goID(), n, len(data), data)
 			}
 
 		// ds5 KeepAlive
 		case <-keepAlive.C:
-			fmt.Printf("KeepAlive: Reload0x5\n")
+			//fmt.Printf("KeepAlive: Reload0x5\n")
 			if !d.Reload0x5() {
-				fmt.Printf("KeepAlive: Reload0x5 failed\n")
+				//fmt.Printf("KeepAlive: Reload0x5 failed\n")
 			}
 
 		// shut down

@@ -42,9 +42,9 @@ func (r *Input0x1bt) Unmarshal(data []byte) {
 	}
 }
 
-func (d *Device) handle0x1bt(report []byte) {
+func (d *Device) handle0x1bt(data []byte) {
 	r := Input0x1bt{}
-	r.Unmarshal(report)
+	r.Unmarshal(data)
 
 	d.Axis.Left.Set(r.LeftX, r.LeftY)
 	d.Axis.Right.Set(r.RightX, r.RightY)

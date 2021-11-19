@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 	"github.com/frifox/ds5"
 	"math"
@@ -23,8 +24,6 @@ func main() {
 	// I like when up is +1 and down is -1
 	dev.Axis.Left.InvertY = true
 	dev.Axis.Right.InvertY = true
-
-	dev.PlayerLEDs[1] = false
 
 	// bind to events before we start ds5 watcher
 	setLeftButtonCallbacks()
@@ -89,18 +88,22 @@ func setRightButtonCallbacks() {
 	dev.Buttons.Square.OnKeyDown = func() {
 		dev.LightBar.SetRed()
 		dev.ApplyProps()
+		fmt.Printf("[Square] LightBar.SetRed()\n")
 	}
 	dev.Buttons.Cross.OnKeyDown = func() {
 		dev.LightBar.SetGreen()
 		dev.ApplyProps()
+		fmt.Printf("[Cross] LightBar.SetGreen()\n")
 	}
 	dev.Buttons.Circle.OnKeyDown = func() {
 		dev.LightBar.SetBlue()
 		dev.ApplyProps()
+		fmt.Printf("[Circle] LightBar.SetBlue()\n")
 	}
 	dev.Buttons.Triangle.OnKeyDown = func() {
 		dev.LightBar = ds5.LightBar{255, 255, 255}
 		dev.ApplyProps()
+		fmt.Printf("[Triangle] LightBar(255,255,255)\n")
 	}
 }
 
@@ -136,16 +139,18 @@ func setCenterButtonCallbacks() {
 		if currentBar > 5 {
 			currentBar = 5
 		}
-		dev.PlayerLEDs.SetBar(currentBar)
+		dev.PlayerLEDs.SetDot(currentBar)
 		dev.ApplyProps()
+		fmt.Printf("[Share] SetDot(%d)\n", currentBar)
 	}
 	dev.Buttons.Options.OnKeyDown = func() {
 		currentBar++
 		if currentBar > 5 {
 			currentBar = 0
 		}
-		dev.PlayerLEDs.SetBar(currentBar)
+		dev.PlayerLEDs.SetDot(currentBar)
 		dev.ApplyProps()
+		fmt.Printf("[Options] SetDot(%d)\n", currentBar)
 	}
 
 	// toggle mute button
@@ -153,6 +158,7 @@ func setCenterButtonCallbacks() {
 		dev.Mic.LED = !dev.Mic.LED  // toggle LED
 		dev.Mic.Muted = dev.Mic.LED // and match mic to the LED
 		dev.ApplyProps()
+		fmt.Printf("[Mute] Mic.LED(%t)\n", dev.Mic.LED)
 	}
 }
 
@@ -161,20 +167,24 @@ func setBackButtonsCallbacks() {
 	dev.Buttons.L1.OnKeyDown = func() {
 		dev.Rumble.Left = 255
 		dev.ApplyProps()
+		fmt.Printf("[L1] Rumble(255)\n")
 	}
 	dev.Buttons.L1.OnKeyUp = func() {
 		dev.Rumble.Left = 0
 		dev.ApplyProps()
+		fmt.Printf("[L1] Rumble(0)\n")
 	}
 
 	// rumble Right while holding
 	dev.Buttons.R1.OnKeyDown = func() {
 		dev.Rumble.Right = 255
 		dev.ApplyProps()
+		fmt.Printf("[R1] Rumble(255)\n")
 	}
 	dev.Buttons.R1.OnKeyUp = func() {
 		dev.Rumble.Right = 0
 		dev.ApplyProps()
+		fmt.Printf("[R1] Rumble(0)\n")
 	}
 }
 
@@ -246,8 +256,18 @@ func setTouchCallbacks() {
 }
 
 func setMiscCallbacks() {
+	dev.Bus.OnChange = func(b ds5.Bus) {
+		fmt.Printf("[Bus] %s\n", b.Type)
+	}
 	dev.Battery.OnChange = func(b ds5.Battery) {
 		fmt.Printf("[Battery] %s (%d%%)\n", b.Status, b.Percent)
+	}
+	dev.Info.OnChange = func(i ds5.Info) {
+		dots := make([]byte, 4)
+		binary.BigEndian.PutUint32(dots, i.FirmwareVersion)
+		dotted := fmt.Sprintf("%d.%d.%d.%d", dots[0], dots[1], dots[2], dots[3])
+
+		fmt.Printf("[Info] MAC[%s], HardwareVersion[0x%x], FirmwareVersion[0x%x / %s]\n", i.MAC, i.HardwareVersion, i.FirmwareVersion, dotted)
 	}
 
 	//dev.AliveFor.OnChange = func(t time.Duration) {

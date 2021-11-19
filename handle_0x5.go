@@ -58,32 +58,22 @@ func (i *Input0x5) Unmarshal(data []byte) {
 	}
 }
 
-func (d *Device) handle0x5(report []byte) {
-	if ReportCRCIsValid(PS_FEATURE_CRC32_SEED, report) {
+// handle0x5 handles calibration info
+func (d *Device) handle0x5(data []byte) {
+	if ReportCRCIsValid(PS_FEATURE_CRC32_SEED, data) {
 		d.Bus.Set("bt")
 	} else {
 		d.Bus.Set("usb")
 	}
 
 	r := Input0x5{}
-	r.Unmarshal(report)
+	r.Unmarshal(data)
 
-	//speed2x := r.InputGyro.SpeedPlus + r.InputGyro.SpeedMinus
-
-	// TODO
 	d.Gyro.pitchCal.Bias = r.InputGyro.PitchBias
-	//d.Gyro.PitchCal.numerator = DS_GYRO_RES_PER_DEG_S * speed2x
-	//d.Gyro.PitchCal.denominator = r.InputGyro.PitchPlus - r.InputGyro.PitchMinus
-
 	d.Gyro.yawCal.Bias = r.InputGyro.YawBias
-	//d.Gyro.YawCal.numerator = DS_GYRO_RES_PER_DEG_S * speed2x
-	//d.Gyro.YawCal.denominator = r.InputGyro.YawPlus - r.InputGyro.YawMinus
-
 	d.Gyro.rollCal.Bias = r.InputGyro.RollBias
-	//d.Gyro.RollCal.numerator = DS_GYRO_RES_PER_DEG_S * speed2x
-	//d.Gyro.RollCal.denominator = r.InputGyro.RollPlus - r.InputGyro.RollMinus
 
 	d.Accel.cal = r.InputAccel
 
-	//fmt.Printf("[%T] %+v\n", d.Gyro, d.Gyro)
+	//fmt.Printf("[%T] %#v\n", r, r)
 }

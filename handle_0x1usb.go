@@ -53,17 +53,9 @@ func (i *Input0x1usb) Unmarshal(data []byte) {
 	}
 }
 
-func (d *Device) handle0x1usb(report []byte) {
+func (d *Device) handle0x1usb(data []byte) {
 	r := Input0x1usb{}
-	reportReader := bytes.NewReader(report)
-	if err := binary.Read(reportReader, binary.LittleEndian, &r); err != nil {
-		panic(err)
-	}
-
-	// sanity check
-	//if !bytes.Equal(report, r.Bytes()) {
-	//	fmt.Printf("ERR Input0x31 sanity check [%X] != [%X], %+v\n", report, r.Bytes(), r)
-	//}
+	r.Unmarshal(data)
 
 	d.Axis.Left.Set(r.LeftX, r.LeftY)
 	d.Axis.Right.Set(r.RightX, r.RightY)
