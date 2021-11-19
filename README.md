@@ -9,7 +9,7 @@ Heavily based on the official [hid-playstation](https://github.com/torvalds/linu
 * Linux: `apt-get install libhidapi-dev libudev-dev`
 * MacOS: `brew install hidapi`
   * on arm64 you may need to manually add path, found via `brew ls hidapi`,
-  * ie: `CGO_CFLAGS="-I /opt/homebrew/Cellar/hidapi/0.11.0/include" CGO_LDFLAGS="-L /opt/homebrew/Cellar/hidapi/0.11.0/lib/" go build .`)
+  * ie: `CGO_CFLAGS="-I /opt/homebrew/Cellar/hidapi/0.11.0/include" CGO_LDFLAGS="-L /opt/homebrew/Cellar/hidapi/0.11.0/lib/" go build .`
 * Windows: I don't have one to test...
 
 # Usage
