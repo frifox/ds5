@@ -1,28 +1,13 @@
 package ds5
 
-type Info struct {
-	MAC string
-
+type Version struct {
 	HardwareVersion uint32
 	FirmwareVersion uint32
 
-	OnChange func(Info)
+	OnChange func(Version)
 }
 
-func (i *Info) SetMAC(mac string) {
-	if i.MAC == mac {
-		return // nothing changed
-	}
-
-	i.MAC = mac
-
-	// any callbacks?
-	if i.OnChange != nil {
-		go i.OnChange(*i)
-	}
-}
-
-func (i *Info) SetHW(hw uint32, fw uint32) {
+func (i *Version) Set(hw uint32, fw uint32) {
 	if i.HardwareVersion == hw && i.FirmwareVersion == fw {
 		return // nothing changed
 	}

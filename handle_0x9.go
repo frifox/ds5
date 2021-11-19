@@ -46,7 +46,7 @@ func (d *Device) handle0x9(data []byte) {
 
 	mac := fmt.Sprintf("% X", r.MAC)
 	mac = strings.ReplaceAll(mac, " ", ":")
-	d.Info.SetMAC(mac)
+	d.MAC.Set(mac)
 
 	//fmt.Printf("[%T] %#v\n", r, r)
 }

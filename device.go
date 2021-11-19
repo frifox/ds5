@@ -12,7 +12,8 @@ const USB_DEVICE_ID_SONY_PS5_CONTROLLER = 0xce6
 
 type Device struct {
 	Bus      Bus
-	Info     Info
+	MAC      MAC
+	Version  Version
 	AliveFor AliveFor
 	Battery  Battery
 
@@ -64,6 +65,9 @@ func (d *Device) Run() {
 
 	// get MAC address, useful for automated BT pairing later on
 	d.Reload0x9()
+
+	// get HW/FW versions (available via BT only)
+	d.Reload0x20()
 
 	// by default DS5 sends 0x1 report, which is pretty basic.
 	// requesting CALIBRATION report causes DS5 to send 0x31 report instead,
@@ -181,7 +185,7 @@ func (d *Device) Writer() {
 
 			_, err := d.hid.Write(data)
 			if err != nil {
-				fmt.Printf("[%T] ERR hid.Write | %v |len(%d) [%X]\n", report, err, data, data)
+				fmt.Printf("[%T] ERR hid.Write [%X]\n", report, data)
 			}
 
 		// ds5 KeepAlive

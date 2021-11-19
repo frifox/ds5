@@ -3,6 +3,8 @@
         //
 
         Bus      Bus
+        MAC      MAC
+        Version  Version
         AliveFor AliveFor
         Battery  Battery
     
@@ -175,7 +177,24 @@ Data packets over BT are CRC32 signed and packets over USB are not. Bus value is
     dev.Bus.OnChange = func(b ds5.Bus) {
 		fmt.Printf("DS5 is now connected via %s\n", b.Type)
 	}
-    
+
+## MAC
+
+    type Mac struct {
+        Address string
+    }
+
+You can read MAC via USB, unplug, and then connect/pair/trust that MAC without having to re-type it.
+
+## Version
+
+    type Version struct {
+        HardwareVersion uint32
+	    FirmwareVersion uint32
+    }
+
+I'm still figuring out what's the use for this info.
+ 
 
 ## AliveFor
 

@@ -53,7 +53,7 @@ func (d *Device) handle0x20(data []byte) {
 	r := Input0x20{}
 	r.Unmarshal(data)
 
-	d.Info.SetHW(r.HardwareVersion, r.FirmwareVersion)
+	d.Version.Set(r.HardwareVersion, r.FirmwareVersion)
 
 	//fmt.Printf("[%T] %#v\n", r, r)
 }

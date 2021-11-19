@@ -262,12 +262,15 @@ func setMiscCallbacks() {
 	dev.Battery.OnChange = func(b ds5.Battery) {
 		fmt.Printf("[Battery] %s (%d%%)\n", b.Status, b.Percent)
 	}
-	dev.Info.OnChange = func(i ds5.Info) {
+	dev.MAC.OnChange = func(i ds5.MAC) {
+		fmt.Printf("[MAC] %s\n", i.Address)
+	}
+	dev.Version.OnChange = func(i ds5.Version) {
 		dots := make([]byte, 4)
 		binary.BigEndian.PutUint32(dots, i.FirmwareVersion)
 		dotted := fmt.Sprintf("%d.%d.%d.%d", dots[0], dots[1], dots[2], dots[3])
 
-		fmt.Printf("[Info] MAC[%s], HardwareVersion[0x%x], FirmwareVersion[0x%x / %s]\n", i.MAC, i.HardwareVersion, i.FirmwareVersion, dotted)
+		fmt.Printf("[Version] Hardware:0x%x, Firmware:0x%x / %s\n", i.HardwareVersion, i.FirmwareVersion, dotted)
 	}
 
 	//dev.AliveFor.OnChange = func(t time.Duration) {
