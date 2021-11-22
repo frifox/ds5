@@ -43,7 +43,10 @@ Note: run ApplyProps() to apply values on the controller. If changing multiple p
 ## Player LEDs
 5 white LEDs below the touchpad
 
-    type PlayerLEDs [5]bool
+    type PlayerLEDs struct {
+        LED [5]bool
+        DisableChangeAnimation bool
+    }
 
 Control individual LEDs:
 

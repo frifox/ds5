@@ -12,14 +12,14 @@ func main() {
 		return
 	}
 
-	dev.Buttons.Square.OnKeyDown = func() {
-		fmt.Printf("Square pressed\n")
+	dev.Buttons.Cross.OnKeyDown = func() {
+		fmt.Printf("[Cross] Pressed\n")
 
 		dev.LightBar.SetRed()
 		dev.ApplyProps()
 	}
-	dev.Buttons.Square.OnKeyUp = func() {
-		fmt.Printf("Square released\n")
+	dev.Buttons.Cross.OnKeyUp = func() {
+		fmt.Printf("[Cross] Released\n")
 
 		dev.LightBar.SetGreen()
 		dev.ApplyProps()

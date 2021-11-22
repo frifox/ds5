@@ -266,11 +266,15 @@ func setMiscCallbacks() {
 		fmt.Printf("[MAC] %s\n", i.Address)
 	}
 	dev.Version.OnChange = func(i ds5.Version) {
-		dots := make([]byte, 4)
-		binary.BigEndian.PutUint32(dots, i.FirmwareVersion)
-		dotted := fmt.Sprintf("%d.%d.%d.%d", dots[0], dots[1], dots[2], dots[3])
+		hwDots := make([]byte, 4)
+		binary.BigEndian.PutUint32(hwDots, i.HardwareVersion)
+		hwDot := fmt.Sprintf("%d.%d.%d.%d", hwDots[0], hwDots[1], hwDots[2], hwDots[3])
 
-		fmt.Printf("[Version] Hardware:0x%x, Firmware:0x%x / %s\n", i.HardwareVersion, i.FirmwareVersion, dotted)
+		fwDots := make([]byte, 4)
+		binary.BigEndian.PutUint32(fwDots, i.FirmwareVersion)
+		fwDot := fmt.Sprintf("%d.%d.%d.%d", fwDots[0], fwDots[1], fwDots[2], fwDots[3])
+
+		fmt.Printf("[Version] Hardware:0x%x (%s), Firmware:0x%x (%s)\n", i.HardwareVersion, hwDot, i.FirmwareVersion, fwDot)
 	}
 
 	//dev.AliveFor.OnChange = func(t time.Duration) {

@@ -1,15 +1,18 @@
 package ds5
 
-type PlayerLEDs [5]bool
+type PlayerLEDs struct {
+	LED                    [5]bool
+	DisableChangeAnimation bool
+}
 
 func (l *PlayerLEDs) AllOff() {
-	for id, _ := range l {
-		l[id] = false
+	for id, _ := range l.LED {
+		l.LED[id] = false
 	}
 }
 func (l *PlayerLEDs) AllOn() {
-	for id, _ := range l {
-		l[id] = true
+	for id, _ := range l.LED {
+		l.LED[id] = true
 	}
 }
 
@@ -27,7 +30,7 @@ func (l *PlayerLEDs) SetPlayer(playerID uint8) {
 	l.AllOff()
 	if leds, exists := ledPlayerMap[playerID]; exists {
 		for _, id := range leds {
-			l[id] = true
+			l.LED[id] = true
 		}
 	}
 }
@@ -46,7 +49,7 @@ func (l *PlayerLEDs) SetBar(count uint8) {
 	l.AllOff()
 	if leds, exists := ledBarMap[count]; exists {
 		for _, id := range leds {
-			l[id] = true
+			l.LED[id] = true
 		}
 	}
 }
@@ -65,7 +68,7 @@ func (l *PlayerLEDs) SetDot(count uint8) {
 	l.AllOff()
 	if leds, exists := dotMap[count]; exists {
 		for _, id := range leds {
-			l[id] = true
+			l.LED[id] = true
 		}
 	}
 }

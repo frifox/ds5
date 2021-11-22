@@ -23,107 +23,137 @@ func (s *outputSequencer) Get() uint8 {
 	return uint8(seq)
 }
 
+type LEDSetup struct{}
+
 type OutputCommon struct {
+	// bit 0: [Rumble] DS_OUTPUT_VALID_FLAG0_COMPATIBLE_VIBRATION
+	// bit 1: [Rumble] DS_OUTPUT_VALID_FLAG0_HAPTICS_SELECT
+	// bit 2-7: TODO
 	ValidFlag0 byte
+
+	// bit 0: [Mic] DS_OUTPUT_VALID_FLAG1_MIC_MUTE_LED_CONTROL_ENABLE
+	// bit 1: [Mic] DS_OUTPUT_VALID_FLAG1_POWER_SAVE_CONTROL_ENABLE
+	// bit 2: [LightBar] DS_OUTPUT_VALID_FLAG1_LIGHTBAR_CONTROL_ENABLE
+	// bit 3: TODO
+	// bit 4: [PlayerLEDs] DS_OUTPUT_VALID_FLAG1_PLAYER_INDICATOR_CONTROL_ENABLE
+	// bit 5-7: TODO
 	ValidFlag1 byte
 
+	// [Rumble] uint8
 	MotorRight byte
-	MotorLeft  byte
+	// [Rumble] uint8
+	MotorLeft byte
 
-	Reserved         [4]byte
-	MuteButtonLED    byte
+	// TODO
+	Reserved [4]byte
+
+	// bit 0: Mute LED
+	// bit 1-7: TODO
+	MuteButtonLED byte
+
+	// bit 0-3: TODO
+	// bit 4: [Mic] DS_OUTPUT_POWER_SAVE_CONTROL_MIC_MUTE
+	// bit 5-7: TODO
 	PowerSaveControl byte
-	Reserved2        [28]byte
 
-	ValidFlag2    byte
-	Reserved3     [2]byte
+	// TODO
+	Reserved2 [28]byte
+
+	// bit 0: TODO
+	// bit 1: [LEDSetup] DS_OUTPUT_VALID_FLAG2_LIGHTBAR_SETUP_CONTROL_ENABLE
+	// bit 2-7: TODO
+	ValidFlag2 byte
+
+	// TODO
+	Reserved3 [2]byte
+
+	// bit 0: TODO
+	// bit 1: [LEDSetup] DS_OUTPUT_LIGHTBAR_SETUP_LIGHT_OUT
+	// bit 2-7: TODO
 	LightBarSetup byte
-	LedBrightness byte
-	PlayerLEDs    byte
 
-	LightBarRed   byte
+	// TODO
+	LedBrightness byte
+
+	// bit 0-4: [PlayerLEDs] 5 led's
+	// bit 5: [PlayerLEDs] fade LED animation 0:on/1:off (default: 0)
+	// bit 6-7: TODO
+	PlayerLEDs byte
+
+	// [LightBar] uint8
+	LightBarRed byte
+	// [LightBar] uint8
 	LightBarGreen byte
-	LightBarBlue  byte
+	// [LightBar] uint8
+	LightBarBlue byte
 }
 
 func (r *OutputCommon) ApplyProp(prop interface{}) {
-	switch p := prop.(type) {
-	// flag0 bit 0, 1
+	switch prop := prop.(type) {
 	case Rumble:
 		//fmt.Printf("[Emit0x31] %#v\n", p)
 
-		r.ValidFlag0 |= DS_OUTPUT_VALID_FLAG0_HAPTICS_SELECT
 		r.ValidFlag0 |= DS_OUTPUT_VALID_FLAG0_COMPATIBLE_VIBRATION
+		r.ValidFlag0 |= DS_OUTPUT_VALID_FLAG0_HAPTICS_SELECT
 
-		r.MotorLeft = p.Left
-		r.MotorRight = p.Right
-
-	// flag0 bit 2 - 7 ?
-
-	// flag1 bit 0, 1
+		r.MotorRight = prop.Right
+		r.MotorLeft = prop.Left
 	case Mic:
 		//fmt.Printf("[Emit0x31] %#v\n", p)
 
-		r.ValidFlag1 |= DS_OUTPUT_VALID_FLAG1_MIC_MUTE_LED_CONTROL_ENABLE
-
 		// enable/disable mute LED
-		if p.LED {
+		r.ValidFlag1 |= DS_OUTPUT_VALID_FLAG1_MIC_MUTE_LED_CONTROL_ENABLE
+		if prop.LED {
 			r.MuteButtonLED = 0x1
 		} else {
 			r.MuteButtonLED = 0x0
 		}
 
+		// enable/disable microphone
 		r.ValidFlag1 |= DS_OUTPUT_VALID_FLAG1_POWER_SAVE_CONTROL_ENABLE
-		if p.Muted {
+		if prop.Muted {
 			r.PowerSaveControl |= DS_OUTPUT_POWER_SAVE_CONTROL_MIC_MUTE
 		} else {
 			r.PowerSaveControl &= ^DS_OUTPUT_POWER_SAVE_CONTROL_MIC_MUTE
 		}
-
-	// flag1 bit 2
 	case LightBar:
 		//fmt.Printf("[Emit0x31] %#v\n", p)
 
 		r.ValidFlag1 |= DS_OUTPUT_VALID_FLAG1_LIGHTBAR_CONTROL_ENABLE
 
 		// convert 0-255 to 0-128
-		r.LightBarRed = uint8(ConvertRange(0, 255, 0, 128, p.Red))
-		r.LightBarGreen = uint8(ConvertRange(0, 255, 0, 128, p.Green))
-		r.LightBarBlue = uint8(ConvertRange(0, 255, 0, 128, p.Blue))
-
-	// flag1 bit 3 ?
-
-	// flag1 bit 4
+		r.LightBarRed = uint8(ConvertRange(0, 255, 0, 128, prop.Red))
+		r.LightBarGreen = uint8(ConvertRange(0, 255, 0, 128, prop.Green))
+		r.LightBarBlue = uint8(ConvertRange(0, 255, 0, 128, prop.Blue))
 	case PlayerLEDs:
 		//fmt.Printf("[Emit0x31] %#v\n", p)
 
 		r.ValidFlag1 |= DS_OUTPUT_VALID_FLAG1_PLAYER_INDICATOR_CONTROL_ENABLE
 
-		// LedID to Bit map
-		led := []uint8{
+		// led bit map
+		ledBitMap := []uint8{
 			0: 1 << 0,
 			1: 1 << 1,
 			2: 1 << 2,
 			3: 1 << 3,
 			4: 1 << 4,
 		}
-		for id := 0; id < 5; id++ {
-			if p[id] {
-				r.PlayerLEDs |= led[id]
+		for ledID := 0; ledID < 5; ledID++ {
+			if prop.LED[ledID] {
+				r.PlayerLEDs |= ledBitMap[ledID]
 			}
 		}
 
-	// flag1 bit 4 - 7 ?
-
-	// flag2 bit 0 ?
-
-	// flag2 bit 1
+		// fade-animate led change
+		if prop.DisableChangeAnimation {
+			r.PlayerLEDs |= 1 << 5
+		} else {
+			r.PlayerLEDs |= 0 << 5
+		}
 	case LEDSetup:
 		//fmt.Printf("[Emit0x31] %#v\n", p)
 
 		r.ValidFlag2 = DS_OUTPUT_VALID_FLAG2_LIGHTBAR_SETUP_CONTROL_ENABLE
 		r.LightBarSetup = DS_OUTPUT_LIGHTBAR_SETUP_LIGHT_OUT
 	}
-
-	// flag2 bit 2 - 7 ?
 }

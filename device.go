@@ -35,13 +35,14 @@ type Device struct {
 
 	context.Context
 	Close context.CancelFunc
+
+	Boot     context.Context
+	BootDone context.CancelFunc
 }
 
 type Report interface {
 	Marshal() []byte
 }
-
-type LEDSetup struct{}
 
 func (d *Device) Find() (err error) {
 	d.hid, err = hid.OpenFirst(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS5_CONTROLLER)
@@ -81,6 +82,10 @@ func (d *Device) Run() {
 		d.emit0x2(LEDSetup{})
 	case "bt":
 		d.emit0x31(LEDSetup{})
+	}
+
+	if d.BootDone != nil {
+		d.BootDone()
 	}
 
 	// will block until error
@@ -190,7 +195,7 @@ func (d *Device) Writer() {
 
 		// ds5 KeepAlive
 		case <-keepAlive.C:
-			//fmt.Printf("KeepAlive: Reload0x5\n")
+			fmt.Printf("KeepAlive: Reload0x5\n")
 			if !d.Reload0x5() {
 				//fmt.Printf("KeepAlive: Reload0x5 failed\n")
 			}
