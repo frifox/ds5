@@ -77,12 +77,7 @@ func (d *Device) Run() {
 
 	// The hardware may have control over the LEDs (e.g. in Bluetooth on startup).
 	// Reset the LEDs (lightbar, mute, player leds), so we can control them later.
-	switch d.Bus.Type {
-	case "usb":
-		d.emit0x2(LEDSetup{})
-	case "bt":
-		d.emit0x31(LEDSetup{})
-	}
+	d.LEDLock(false)
 
 	if d.BootDone != nil {
 		d.BootDone()
@@ -93,6 +88,18 @@ func (d *Device) Run() {
 
 	// done. Close related workers
 	d.Close()
+}
+func (d *Device) LEDLock(lock bool) {
+	switch d.Bus.Type {
+	case "usb":
+		d.emit0x2(LEDSetup{
+			Locked: lock,
+		})
+	case "bt":
+		d.emit0x31(LEDSetup{
+			Locked: lock,
+		})
+	}
 }
 func (d *Device) Reload0x5() (ok bool) {
 	data := d.GetFeatureReport(DS_FEATURE_REPORT_CALIBRATION)

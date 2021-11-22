@@ -23,8 +23,6 @@ func (s *outputSequencer) Get() uint8 {
 	return uint8(seq)
 }
 
-type LEDSetup struct{}
-
 type OutputCommon struct {
 	// bit 0: [Rumble] DS_OUTPUT_VALID_FLAG0_COMPATIBLE_VIBRATION
 	// bit 1: [Rumble] DS_OUTPUT_VALID_FLAG0_HAPTICS_SELECT
@@ -151,9 +149,15 @@ func (r *OutputCommon) ApplyProp(prop interface{}) {
 			r.PlayerLEDs |= 0 << 5
 		}
 	case LEDSetup:
+
 		//fmt.Printf("[Emit0x31] %#v\n", p)
 
-		r.ValidFlag2 = DS_OUTPUT_VALID_FLAG2_LIGHTBAR_SETUP_CONTROL_ENABLE
-		r.LightBarSetup = DS_OUTPUT_LIGHTBAR_SETUP_LIGHT_OUT
+		if prop.Locked {
+			r.ValidFlag2 = DS_OUTPUT_VALID_FLAG2_LIGHTBAR_SETUP_CONTROL_ENABLE
+			r.LightBarSetup |= 1 << 0
+		} else {
+			r.ValidFlag2 = DS_OUTPUT_VALID_FLAG2_LIGHTBAR_SETUP_CONTROL_ENABLE
+			r.LightBarSetup |= DS_OUTPUT_LIGHTBAR_SETUP_LIGHT_OUT // 1<<1
+		}
 	}
 }
