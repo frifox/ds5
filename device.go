@@ -34,7 +34,7 @@ type Device struct {
 	writer chan Report
 
 	context.Context
-	Close context.CancelFunc
+	context.CancelFunc
 
 	Boot     context.Context
 	BootDone context.CancelFunc
@@ -51,7 +51,7 @@ func (d *Device) Find() (err error) {
 		err = fmt.Errorf("%x:%dx not found: %v", USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS5_CONTROLLER, err)
 	}
 
-	d.Context, d.Close = context.WithCancel(context.Background())
+	d.Context, d.CancelFunc = context.WithCancel(context.Background())
 
 	return
 }
@@ -61,19 +61,20 @@ func (d *Device) Found() bool {
 }
 
 func (d *Device) Run() {
+	go d.Reader()
 	d.writer = make(chan Report)
 	go d.Writer()
 
 	// get MAC address, useful for automated BT pairing later on
-	d.Reload0x9()
+	d.reload0x9()
 
 	// get HW/FW versions (available via BT only)
-	d.Reload0x20()
+	d.reload0x20()
 
 	// by default DS5 sends 0x1 report, which is pretty basic.
 	// requesting CALIBRATION report causes DS5 to send 0x31 report instead,
 	// which includes goodies like Mute/Touch/Gyro/Accel/Battery/etc
-	d.Reload0x5()
+	d.reload0x5()
 
 	// The hardware may have control over the LEDs (e.g. in Bluetooth on startup).
 	// Reset the LEDs (lightbar, mute, player leds), so we can control them later.
@@ -83,11 +84,7 @@ func (d *Device) Run() {
 		d.BootDone()
 	}
 
-	// will block until error
-	d.Reader()
-
-	// done. Close related workers
-	d.Close()
+	<-d.Done()
 }
 func (d *Device) LEDLock(lock bool) {
 	switch d.Bus.Type {
@@ -101,7 +98,7 @@ func (d *Device) LEDLock(lock bool) {
 		})
 	}
 }
-func (d *Device) Reload0x5() (ok bool) {
+func (d *Device) reload0x5() (ok bool) {
 	data := d.GetFeatureReport(DS_FEATURE_REPORT_CALIBRATION)
 	switch len(data) {
 	case DS_FEATURE_REPORT_CALIBRATION_SIZE:
@@ -112,7 +109,7 @@ func (d *Device) Reload0x5() (ok bool) {
 	}
 	return false
 }
-func (d *Device) Reload0x9() (ok bool) {
+func (d *Device) reload0x9() (ok bool) {
 	data := d.GetFeatureReport(DS_FEATURE_REPORT_PAIRING_INFO)
 	switch len(data) {
 	case DS_FEATURE_REPORT_PAIRING_INFO_SIZE:
@@ -123,7 +120,7 @@ func (d *Device) Reload0x9() (ok bool) {
 	}
 	return false
 }
-func (d *Device) Reload0x20() (ok bool) {
+func (d *Device) reload0x20() (ok bool) {
 	data := d.GetFeatureReport(DS_FEATURE_REPORT_FIRMWARE_INFO)
 	switch len(data) {
 	case DS_FEATURE_REPORT_FIRMWARE_INFO_SIZE:
@@ -181,8 +178,10 @@ func (d *Device) Reader() {
 		default:
 			fmt.Printf("[InputReport] UNKNOWN len(%d) % X\n", len(report), report)
 		}
-
 	}
+
+	// error. We're done here
+	d.CancelFunc()
 }
 
 func (d *Device) Writer() {
@@ -203,7 +202,7 @@ func (d *Device) Writer() {
 		// ds5 KeepAlive
 		case <-keepAlive.C:
 			fmt.Printf("KeepAlive: Reload0x5\n")
-			if !d.Reload0x5() {
+			if !d.reload0x5() {
 				//fmt.Printf("KeepAlive: Reload0x5 failed\n")
 			}
 
