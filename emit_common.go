@@ -45,7 +45,7 @@ type OutputCommon struct {
 	// TODO
 	Reserved [4]byte
 
-	// bit 0: Mute LED
+	// bit 0: [Mic] LED on/off
 	// bit 1-7: TODO
 	MuteButtonLED byte
 
