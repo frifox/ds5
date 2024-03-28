@@ -48,15 +48,12 @@ func (d *Device) Find() (err error) {
 	d.hid, err = hid.OpenFirst(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS5_CONTROLLER)
 
 	if d.hid == nil {
-		err = fmt.Errorf("%x:%dx not found: %v", USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS5_CONTROLLER, err)
+		return fmt.Errorf("%x:%dx not found: %v", USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS5_CONTROLLER, err)
 	}
 
-	if d.CancelFunc != nil {
-		d.CancelFunc()
-	}
 	d.Context, d.CancelFunc = context.WithCancel(context.Background())
 
-	return
+	return nil
 }
 
 func (d *Device) Found() bool {
